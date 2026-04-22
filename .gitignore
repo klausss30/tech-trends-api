@@ -10,6 +10,7 @@ venv/
 # Environment variables
 .env
 .env.*
+!.env.example
 
 # VSCode settings
 .vscode/
@@ -22,6 +23,9 @@ venv/
 
 # Log files
 *.log
+.coverage
+htmlcov/
+.pytest_cache/
 
 # Database and cache files
 *.sqlite3
@@ -32,3 +36,8 @@ instance/
 
 # Deployment files (optional)
 *.pid
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
