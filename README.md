@@ -18,7 +18,8 @@ Backend API for a tech-trend dashboard that analyzes GitHub trending repository 
 - PostgreSQL
 - psycopg2
 - Supabase PostgreSQL
-- Render
+- Docker
+- Cloudflare Tunnel
 
 ## API Endpoints
 
@@ -60,7 +61,10 @@ Python ETL pipeline
 PostgreSQL / Supabase
         |
         v
-Flask API on Render
+Dockerized Flask API
+        |
+        v
+Cloudflare Tunnel
         |
         v
 React dashboard
@@ -149,6 +153,59 @@ curl "http://localhost:5000/api/keywords?since=daily"
 curl "http://localhost:5000/api/top-repositories?since=monthly"
 ```
 
+## Docker
+
+Create your local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Set `DATABASE_URL` in `.env`, then build and run the API:
+
+```bash
+docker compose up --build api
+```
+
+The API will be available at:
+
+```text
+http://localhost:5000/api/health
+```
+
+You can also build and run without Docker Compose:
+
+```bash
+docker build -t tech-trends-api .
+docker run --rm -p 5000:5000 --env-file .env tech-trends-api
+```
+
+## Cloudflare Tunnel
+
+For a stable public URL, create a Cloudflare Tunnel in the Cloudflare Zero Trust dashboard, route it to this internal service:
+
+```text
+http://api:5000
+```
+
+Then copy the tunnel token into `.env`:
+
+```env
+CLOUDFLARE_TUNNEL_TOKEN=your-cloudflare-tunnel-token
+```
+
+Run the API and tunnel together:
+
+```bash
+docker compose --profile tunnel up --build
+```
+
+For local-only development, keep using:
+
+```bash
+docker compose up --build api
+```
+
 ## Tests
 
 Install development dependencies:
@@ -165,7 +222,7 @@ pytest
 
 ## Security Notes
 
-- Real database credentials should be stored in `.env` locally and in Render environment variables in production.
+- Real database credentials should be stored in `.env` locally and in secure deployment environment variables.
 - `.env` files are ignored by Git; `.env.example` is committed as a safe template.
 - API errors return a generic message to clients while server-side details are logged.
 - Before making the repository public, scan the git history for secrets if real credentials were ever committed.
